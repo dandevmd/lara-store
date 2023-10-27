@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { stateStorage } from "../state/ContextProvider";
 
 const navigation = [
@@ -19,7 +19,11 @@ function logOut(e) {
 }
 
 export default function DefaultLayout() {
-    const { currentUser } = stateStorage();
+    const { currentUser, userToken } = stateStorage();
+
+    if (!userToken) {
+        return <Navigate to="/login" />;
+    }
 
     return (
         <>

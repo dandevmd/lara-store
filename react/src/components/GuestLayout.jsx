@@ -1,8 +1,14 @@
 import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { stateStorage } from "../state/ContextProvider";
 
 const GuestLayout = () => {
+    const { currentUser, userToken } = stateStorage();
     const location = useLocation();
+
+    if (userToken) {
+        return <Navigate to="/" />;
+    }
 
     return (
         <>

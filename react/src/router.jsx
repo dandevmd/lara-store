@@ -5,15 +5,17 @@ import Dashboard from "./views/Dashboard.jsx";
 import Surveys from "./views/Surveys.jsx";
 import GuestLayout from "./components/GuestLayout.jsx";
 import DefaultLayout from "./components/DefaultLayout.jsx";
+import SurveysView from "./views/SurveysView.jsx";
 
 export const router = createBrowserRouter([
     {
         path: "/",
         element: <DefaultLayout />,
         children: [
-            { path: "/dashboard", element: <Navigate to="/" /> },
             { path: "/", element: <Dashboard /> },
+            { path: "/dashboard", element: <Navigate to="/" /> },
             { path: "/surveys", element: <Surveys /> },
+            { path: "/surveys/create", element: <SurveysView /> },
         ],
     },
 
