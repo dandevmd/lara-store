@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, Link } from "react-router-dom";
 import { stateStorage } from "../state/ContextProvider";
 
 const GuestLayout = () => {
@@ -24,6 +24,29 @@ const GuestLayout = () => {
                             ? "Sign in to your account"
                             : "Create an account"}
                     </h2>
+                    {location.pathname === "/login" ? (
+                        <h4 className="font-semibold text-black-600 text-center mt-4">
+                            Or{" "}
+                            <Link
+                                to="/register"
+                                className="font-semibold text-indigo-600 hover:text-indigo-500"
+                            >
+                                Register!
+                            </Link>{" "}
+                            if you don't have an account{" "}
+                        </h4>
+                    ) : (
+                        <h4 className="font-semibold text-black-600 text-center mt-4">
+                            Or{" "}
+                            <Link
+                                to="/login"
+                                className="font-semibold text-indigo-600 hover:text-indigo-500"
+                            >
+                                Login!
+                            </Link>{" "}
+                            if you have an account{" "}
+                        </h4>
+                    )}
                 </div>
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     <Outlet />

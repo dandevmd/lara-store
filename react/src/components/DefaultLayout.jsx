@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
 import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { stateStorage } from "../state/ContextProvider";
+import axiosClient from "../request/axiosclient";
 
 const navigation = [
     { name: "Dashboard", to: "/" },
@@ -13,13 +14,24 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
 }
 
-function logOut(e) {
-    e.preventDefault();
-    console.log("Logout");
-}
-
 export default function DefaultLayout() {
-    const { currentUser, userToken } = stateStorage();
+    const { currentUser, setCurrentUser, userToken, setUserToken } =
+        stateStorage();
+
+    function logOut(e) {
+        e.preventDefault();
+
+        axiosClient
+            .post("logout")
+            .then(() => {
+                localStorage.removeItem("TOKEN");
+                setCurrentUser({});
+                setUserToken(null);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
     if (!userToken) {
         return <Navigate to="/login" />;
