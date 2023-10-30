@@ -1,5 +1,5 @@
 import { LinkIcon, PhotoIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TButton from "../components/core/TButton";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../request/axiosclient";
@@ -8,6 +8,7 @@ import SurveyQuestions from "../components/SurveyQuestions";
 
 export default function SurveyView() {
     const navigate = useNavigate();
+    const [error, setError] = useState("");
     const [survey, setSurvey] = useState({
         title: "",
         slug: "",
@@ -44,11 +45,30 @@ export default function SurveyView() {
         }
         delete payload.image_url;
 
-        axiosClient.post("/survey", payload).then((res) => {
-            console.log(res);
-            navigate("/surveys");
-        });
+        axiosClient
+            .post("/survey", payload)
+            .then((res) => {
+                console.log(res);
+                navigate("/surveys");
+            })
+            .catch((err) => {
+                err && err.response && setError(err.response.data.message);
+            });
     };
+
+    const onSurveyUpdate = (survey) => {
+        setSurvey({ ...survey });
+    };
+
+    useEffect(() => {
+        let timer;
+
+        timer = setTimeout(() => {
+            if (error) {
+                setError("");
+            }
+        }, 3000);
+    }, [error]);
 
     return (
         <PageComponent
@@ -71,6 +91,11 @@ export default function SurveyView() {
             <form action="/survey" method="POST" onSubmit={(e) => onSubmit(e)}>
                 <div className="shadow sm:overflow-hidden sm:rounded-md">
                     <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
+                        {error && (
+                            <div className="bg-red-500 text-white rounded-lg p-3">
+                                {error}
+                            </div>
+                        )}
                         {/*Image*/}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
@@ -178,8 +203,6 @@ export default function SurveyView() {
                         </div>
                         {/*Expire Date*/}
 
-                        <SurveyQuestions />
-
                         {/*Active*/}
                         <div className="flex items-start">
                             <div className="flex h-5 items-center">
@@ -210,6 +233,11 @@ export default function SurveyView() {
                             </div>
                         </div>
                         {/*Active*/}
+
+                        <SurveyQuestions
+                            survey={survey}
+                            onSurveyUpdate={onSurveyUpdate}
+                        />
 
                         <button type="button">Add question</button>
                     </div>
