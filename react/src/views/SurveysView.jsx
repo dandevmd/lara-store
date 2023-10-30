@@ -2,8 +2,12 @@ import { LinkIcon, PhotoIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import TButton from "../components/core/TButton";
 import PageComponent from "../components/PageComponent";
+import axiosClient from "../request/axiosclient";
+import { useNavigate } from "react-router-dom";
+import SurveyQuestions from "../components/SurveyQuestions";
 
 export default function SurveyView() {
+    const navigate = useNavigate();
     const [survey, setSurvey] = useState({
         title: "",
         slug: "",
@@ -14,6 +18,37 @@ export default function SurveyView() {
         expire_date: "",
         questions: [],
     });
+
+    const onImageChoose = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            setSurvey({
+                ...survey,
+                image: file,
+                image_url: reader.result,
+            });
+
+            e.target.value = "";
+        };
+
+        reader.readAsDataURL(file);
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+        const payload = { ...survey };
+        if (payload.image) {
+            payload.image = payload.image_url;
+        }
+        delete payload.image_url;
+
+        axiosClient.post("/survey", payload).then((res) => {
+            console.log(res);
+            navigate("/surveys");
+        });
+    };
 
     return (
         <PageComponent
@@ -33,7 +68,7 @@ export default function SurveyView() {
                 </div>
             }
         >
-            <form action="#" method="POST">
+            <form action="/survey" method="POST" onSubmit={(e) => onSubmit(e)}>
                 <div className="shadow sm:overflow-hidden sm:rounded-md">
                     <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
                         {/*Image*/}
@@ -61,6 +96,7 @@ export default function SurveyView() {
                                     <input
                                         type="file"
                                         className="absolute left-0 top-0 right-0 bottom-0 opacity-0"
+                                        onChange={(e) => onImageChoose(e)}
                                     />
                                     Change
                                 </button>
@@ -141,6 +177,8 @@ export default function SurveyView() {
                             />
                         </div>
                         {/*Expire Date*/}
+
+                        <SurveyQuestions />
 
                         {/*Active*/}
                         <div className="flex items-start">
