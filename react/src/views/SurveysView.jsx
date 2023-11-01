@@ -20,6 +20,17 @@ export default function SurveyView() {
         questions: [],
     });
 
+    useEffect(() => {
+        let timer;
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            if (error) {
+                setError("");
+            }
+        }, 3000);
+    }, [error]);
+
     const onImageChoose = (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
@@ -56,19 +67,9 @@ export default function SurveyView() {
             });
     };
 
-    const onSurveyUpdate = (survey) => {
-        setSurvey({ ...survey });
+    const onQuestionsUpdate = (questions) => {
+        setSurvey({ ...survey, questions: questions });
     };
-
-    useEffect(() => {
-        let timer;
-
-        timer = setTimeout(() => {
-            if (error) {
-                setError("");
-            }
-        }, 3000);
-    }, [error]);
 
     return (
         <PageComponent
@@ -235,11 +236,9 @@ export default function SurveyView() {
                         {/*Active*/}
 
                         <SurveyQuestions
-                            survey={survey}
-                            onSurveyUpdate={onSurveyUpdate}
+                            questions={survey.questions}
+                            onQuestionsUpdate={onQuestionsUpdate}
                         />
-
-                        <button type="button">Add question</button>
                     </div>
                     <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
                         <TButton>Save</TButton>

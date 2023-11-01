@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\QuestionTypeEnum;
-use App\Http\Requests\StoreSurveyAnswerRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
-use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
-use App\Models\SurveyQuestionAnswer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Symfony\Component\HttpFoundation\Request;
+use App\Enums\QuestionTypeEnum;
 
 class SurveyController extends Controller
 {
@@ -41,7 +38,6 @@ class SurveyController extends Controller
     public function store(StoreSurveyRequest $request)
     {
         $data = $request->validated();
-
         // Check if image was given and save on local file system
         if (isset($data['image'])) {
             $relativePath = $this->saveImage($data['image']);
@@ -187,14 +183,16 @@ class SurveyController extends Controller
             'question' => 'required|string',
             'type' => [
                 'required',
-                new Enum(QuestionTypeEnum::class)
+                new Enum(QuestionTypeEnum::class),
             ],
             'description' => 'nullable|string',
             'data' => 'present',
             'survey_id' => 'exists:App\Models\Survey,id'
         ]);
 
-        return SurveyQuestion::create($validator->validated());
+        $question = SurveyQuestion::create($validator->validated());
+
+        return $question;
     }
 
 

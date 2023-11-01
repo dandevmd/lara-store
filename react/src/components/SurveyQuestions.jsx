@@ -4,49 +4,47 @@ import { v4 as uuidv4 } from "uuid";
 
 import QuestionEditorItem from "./QuestionEditorItem";
 
-const SurveyQuestions = ({ survey, onSurveyUpdate }) => {
-    const [model, setModel] = useState({ ...survey });
+const SurveyQuestions = ({ questions, onQuestionsUpdate }) => {
+    const [myQuestions, setMyQuestions] = useState([...questions]);
 
-    const addQuestion = () => {
-        setModel({
-            ...model,
-            questions: [
-                ...model.questions,
-                {
-                    id: v4(),
-                    type: "text",
-                    question: "",
-                    description: "",
-                    data: {},
-                },
-            ],
+    const addQuestion = (e, index) => {
+        e.preventDefault();
+
+        index = index !== undefined ? index : myQuestions.length;
+        myQuestions.splice(index, 0, {
+            id: uuidv4(),
+            type: "text",
+            question: "",
+            description: "",
+            data: {},
         });
+
+        setMyQuestions([...myQuestions]);
+        onQuestionsUpdate(myQuestions);
     };
 
     const questionChange = (question) => {
         if (!question) return;
-
-        setModel({
-            ...model,
-            questions: model.questions.map((q) => {
-                if (q.id === question.id) {
-                    return { ...question };
-                }
-                return q;
-            }),
+        const newQuestions = myQuestions.map((q) => {
+            if (q.id === question.id) {
+                return question;
+            }
+            return q;
         });
+
+        setMyQuestions(newQuestions);
+        onQuestionsUpdate(newQuestions);
     };
 
     const deleteQuestion = (question) => {
-        setModel({
-            ...model,
-            questions: model.questions.filter((q) => q.id !== question.id),
-        });
+        const newQuestions = myQuestions.filter((q) => q.id !== question.id);
+        setMyQuestions(newQuestions);
+        onQuestionsUpdate(newQuestions);
     };
 
     useEffect(() => {
-        onSurveyUpdate(model);
-    }, [model]);
+        onQuestionsUpdate(myQuestions);
+    }, [myQuestions]);
 
     return (
         <>
@@ -57,19 +55,19 @@ const SurveyQuestions = ({ survey, onSurveyUpdate }) => {
                     className="flex items-center py-1 px-4 text-white rounded-sm bg-gray-600 hover:bg-slate-700"
                     onClick={addQuestion}
                 >
-                    <PlusIcon className="w-4 mr-2" />
+                    Add new Question <PlusIcon className="w-4 ml-3 mr-1" />
                 </button>
             </div>
 
-            {model.questions.length ? (
-                model.questions.map((question, idx) => (
+            {myQuestions.length ? (
+                myQuestions.map((question, idx) => (
                     <QuestionEditorItem
+                        key={question.id}
                         index={idx}
                         question={question}
-                        key={question.id}
                         questionChange={questionChange}
                         addQuestion={addQuestion}
-                        deleteQuestion={(e) => deleteQuestion(e)}
+                        deleteQuestion={deleteQuestion}
                     />
                 ))
             ) : (
