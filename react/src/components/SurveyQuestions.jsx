@@ -43,8 +43,8 @@ const SurveyQuestions = ({ questions, onQuestionsUpdate }) => {
     };
 
     useEffect(() => {
-        onQuestionsUpdate(myQuestions);
-    }, [myQuestions]);
+        setMyQuestions(questions);
+    }, [questions]);
 
     return (
         <>
@@ -59,7 +59,7 @@ const SurveyQuestions = ({ questions, onQuestionsUpdate }) => {
                 </button>
             </div>
 
-            {myQuestions.length ? (
+            {myQuestions && myQuestions.length ? (
                 myQuestions.map((question, idx) => (
                     <QuestionEditorItem
                         key={question.id}

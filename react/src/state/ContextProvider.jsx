@@ -3,6 +3,10 @@ import React, { useState } from "react";
 const Context = React.createContext({
     currentUser: {},
     userToken: null,
+    toast: {
+        message: "",
+        show: false,
+    },
     surveys: [],
     questionTypes: [],
     setCurrentUser: () => {},
@@ -14,6 +18,10 @@ export const ContextProvider = ({ children }) => {
         localStorage.getItem("TOKEN") || ""
     );
     const [surveys, setSurveys] = useState([]);
+    const [toast, setToast] = useState({
+        message: "",
+        show: false,
+    });
     const [currentUser, setCurrentUser] = useState({});
     const [questionTypes] = useState([
         "text",
@@ -33,6 +41,13 @@ export const ContextProvider = ({ children }) => {
         _setUserToken(token);
     };
 
+    const showToast = (message) => {
+        setToast({
+            message,
+            show: true,
+        });
+    };
+
     const value = {
         currentUser,
         setCurrentUser,
@@ -41,6 +56,9 @@ export const ContextProvider = ({ children }) => {
         surveys,
         setSurveys,
         questionTypes,
+        toast,
+        setToast,
+        showToast,
     };
 
     return <Context.Provider value={value}>{children}</Context.Provider>;

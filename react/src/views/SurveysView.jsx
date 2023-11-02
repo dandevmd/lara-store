@@ -3,12 +3,17 @@ import { useEffect, useState } from "react";
 import TButton from "../components/core/TButton";
 import PageComponent from "../components/PageComponent";
 import axiosClient from "../request/axiosclient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SurveyQuestions from "../components/SurveyQuestions";
+import Spinner from "../components/Spinner";
+import { stateStorage } from "../state/ContextProvider";
 
 export default function SurveyView() {
+    const { showToast } = stateStorage();
     const navigate = useNavigate();
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+    const { id } = useParams();
     const [survey, setSurvey] = useState({
         title: "",
         slug: "",
@@ -19,6 +24,21 @@ export default function SurveyView() {
         expire_date: "",
         questions: [],
     });
+
+    const getSurvey = () => {
+        if (id) {
+            setLoading(true);
+            axiosClient
+                .get(`/survey/${id}`)
+                .then(({ data }) => {
+                    data && setSurvey(data.data);
+                })
+                .catch((err) => {
+                    err && err.response && setError(err.response.data.message);
+                });
+        }
+        setLoading(false);
+    };
 
     useEffect(() => {
         let timer;
@@ -56,11 +76,24 @@ export default function SurveyView() {
         }
         delete payload.image_url;
 
+        if (!id) {
+            axiosClient
+                .post("/survey", payload)
+                .then((res) => {
+                    console.log(res);
+                    navigate("/surveys");
+                    showToast("Survey created successfully");
+                })
+                .catch((err) => {
+                    err && err.response && setError(err.response.data.message);
+                });
+        }
         axiosClient
-            .post("/survey", payload)
+            .put(`/survey/${id}`, payload)
             .then((res) => {
                 console.log(res);
                 navigate("/surveys");
+                showToast("Survey updated successfully");
             })
             .catch((err) => {
                 err && err.response && setError(err.response.data.message);
@@ -71,7 +104,13 @@ export default function SurveyView() {
         setSurvey({ ...survey, questions: questions });
     };
 
-    return (
+    useEffect(() => {
+        getSurvey();
+    }, []);
+
+    return loading ? (
+        <Spinner />
+    ) : (
         <PageComponent
             buttons={
                 <div className="flex gap-2">

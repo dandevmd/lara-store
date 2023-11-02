@@ -5,11 +5,14 @@ import SurveyListItem from "../components/SurveyListItem";
 import TButton from "../components/core/TButton";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import axiosClient from "../request/axiosclient.jsx";
+import Spinner from "../components/Spinner";
+import { stateStorage } from "../state/ContextProvider";
 
 const Surveys = () => {
     const [surveys, setSurveys] = useState([]);
     const [loading, setLoading] = useState(true);
     const [meta, setMeta] = useState({});
+    const { showToast } = stateStorage();
 
     const getSurveys = (url) => {
         url = url || "/survey";
@@ -28,10 +31,23 @@ const Surveys = () => {
         getSurveys(link.url);
     };
 
+    const deleteSurvey = (e, id) => {
+        e.preventDefault();
+        if (!id) return;
+
+        axiosClient
+            .delete(`/survey/${id}`)
+            .then(() => {
+                getSurveys();
+                showToast("Survey deleted successfully");
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return loading ? (
-        <h1 className="text-3xl font-bold text-center text-purple-500 mt-5">
-            Loading...
-        </h1>
+        <Spinner />
     ) : (
         <PageComponent
             title="Surveys"
@@ -42,10 +58,20 @@ const Surveys = () => {
                 </TButton>
             }
         >
+            {surveys?.length === 0 && (
+                <div className="text-center text-gray-700">
+                    You have not created any survey
+                </div>
+            )}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
-                {surveys?.map((survey) => (
-                    <SurveyListItem survey={survey} key={survey.id} />
-                ))}
+                {surveys &&
+                    surveys?.map((survey) => (
+                        <SurveyListItem
+                            survey={survey}
+                            key={survey.id}
+                            onDeleteClick={deleteSurvey}
+                        />
+                    ))}
             </div>
             <PaginationTable meta={meta} onPageClick={onPageClick} />
         </PageComponent>

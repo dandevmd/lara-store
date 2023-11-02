@@ -4,6 +4,7 @@ import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
 import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { stateStorage } from "../state/ContextProvider";
 import axiosClient from "../request/axiosclient";
+import Toast from "./Toast";
 
 const navigation = [
     { name: "Dashboard", to: "/" },
@@ -207,6 +208,7 @@ export default function DefaultLayout() {
                 </Disclosure>
 
                 <Outlet />
+                <Toast />
             </div>
         </>
     );

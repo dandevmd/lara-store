@@ -16,6 +16,7 @@ export const router = createBrowserRouter([
             { path: "/dashboard", element: <Navigate to="/" /> },
             { path: "/surveys", element: <Surveys /> },
             { path: "/surveys/create", element: <SurveysView /> },
+            { path: "/surveys/:id", element: <SurveysView /> },
         ],
     },
 

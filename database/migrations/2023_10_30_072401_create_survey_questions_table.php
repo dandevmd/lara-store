@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('question', 2000);
             $table->longText('description')->nullable();
             $table->longText('data')->nullable();
-            $table->foreignIdFor(\App\Models\Survey::class, 'survey_id');
+            $table->foreignIdFor(\App\Models\Survey::class, 'survey_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate(); //cascade on delete and update
             $table->timestamps();
         });
     }
