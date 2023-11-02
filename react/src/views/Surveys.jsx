@@ -1,14 +1,38 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import PageComponent from "../components/PageComponent";
-import { stateStorage } from "../state/ContextProvider";
+import PaginationTable from "../components/PaginationTable";
 import SurveyListItem from "../components/SurveyListItem";
 import TButton from "../components/core/TButton";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import axiosClient from "../request/axiosclient.jsx";
 
 const Surveys = () => {
-    const { surveys } = stateStorage();
+    const [surveys, setSurveys] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [meta, setMeta] = useState({});
 
-    return (
+    const getSurveys = (url) => {
+        url = url || "/survey";
+        axiosClient.get(url).then(({ data }) => {
+            data?.data && setSurveys(data.data);
+            setMeta(data.meta);
+            setLoading(false);
+        });
+    };
+
+    useEffect(() => {
+        getSurveys();
+    }, []);
+
+    const onPageClick = (link) => {
+        getSurveys(link.url);
+    };
+
+    return loading ? (
+        <h1 className="text-3xl font-bold text-center text-purple-500 mt-5">
+            Loading...
+        </h1>
+    ) : (
         <PageComponent
             title="Surveys"
             buttons={
@@ -23,6 +47,7 @@ const Surveys = () => {
                     <SurveyListItem survey={survey} key={survey.id} />
                 ))}
             </div>
+            <PaginationTable meta={meta} onPageClick={onPageClick} />
         </PageComponent>
     );
 };

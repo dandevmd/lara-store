@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
 import { NavLink, Outlet, Navigate } from "react-router-dom";
@@ -18,11 +18,17 @@ export default function DefaultLayout() {
     const { currentUser, setCurrentUser, userToken, setUserToken } =
         stateStorage();
 
+    useEffect(() => {
+        axiosClient.get("/me").then(({ data }) => {
+            setCurrentUser(data);
+        });
+    }, []);
+
     function logOut(e) {
         e.preventDefault();
 
         axiosClient
-            .post("logout")
+            .post("/logout")
             .then(() => {
                 localStorage.removeItem("TOKEN");
                 setCurrentUser({});

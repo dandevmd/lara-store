@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { tmpSurveys } from "../fake.js";
 
 const Context = React.createContext({
     currentUser: {},
@@ -14,7 +13,7 @@ export const ContextProvider = ({ children }) => {
     const [userToken, _setUserToken] = useState(
         localStorage.getItem("TOKEN") || ""
     );
-    const [surveys, setSurveys] = useState(tmpSurveys);
+    const [surveys, setSurveys] = useState([]);
     const [currentUser, setCurrentUser] = useState({});
     const [questionTypes] = useState([
         "text",
