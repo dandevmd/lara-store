@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SurveyQuestionAnswer extends Model
 {
     use HasFactory;
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
+    protected $guarded = [];
 }

@@ -108,6 +108,21 @@ export default function SurveyView() {
         getSurvey();
     }, []);
 
+    const onDelete = (e) => {
+        e.preventDefault();
+        if (!id) return;
+
+        axiosClient
+            .delete(`/survey/${id}`)
+            .then(() => {
+                navigate("/surveys");
+                showToast("Survey deleted successfully");
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return loading ? (
         <Spinner />
     ) : (
@@ -116,13 +131,20 @@ export default function SurveyView() {
                 <div className="flex gap-2">
                     <TButton
                         color="green"
-                        href={`/survey/public/${survey.slug}`}
+                        to={`/survey/public/${survey.slug}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/survey/public/${survey.slug}`);
+                        }}
                     >
                         <LinkIcon className="h-4 w-4 mr-2" />
                         Public Link
                     </TButton>
                     <TButton color="red">
-                        <TrashIcon className="h-4 w-4 mr-2" />
+                        <TrashIcon
+                            className="h-4 w-4 mr-2"
+                            onClick={onDelete}
+                        />
                         Delete
                     </TButton>
                 </div>

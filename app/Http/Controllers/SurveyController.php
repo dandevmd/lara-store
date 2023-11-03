@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SurveyQuestionAnswerRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
+use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
+use App\Models\SurveyQuestionAnswer;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -212,6 +215,52 @@ class SurveyController extends Controller
         return $question->update($validator->validated());
     }
 
+    public function getBySlug(Survey $survey)
+    {
+        if (!$survey->status) {
+            return response('', 404);
 
+        }
+
+        $currentDate = new \DateTime();
+        $expireDate = new \DateTime($survey->expire_date);
+
+        if ($currentDate > $expireDate) {
+            return response('', 404);
+        }
+
+        return new SurveyResource($survey);
+    }
+
+    public function storeAnswer(SurveyQuestionAnswerRequest $request, Survey $survey)
+    {
+        $validated = $request->validated();
+
+
+        $surveyAnswer = SurveyAnswer::create([
+            'survey_id' => $survey->id,
+            'start_date' => date('Y-m-d H:i:s'),
+            'end_date' => date('Y-m-d H:i:s'),
+        ]);
+
+        $question = SurveyQuestion::where([
+            'id' => $validated['answers']['question_id'],
+            'survey_id' => $survey->id
+        ])->get();
+
+        if (!$question) {
+            return response('', 404);
+        }
+
+        $data = [
+            'survey_question_id' => $validated['answers']['question_id'],
+            'survey_answer_id' => $surveyAnswer->id,
+            'answer' => json_encode($validated['answers']['answer'])
+        ];
+
+        $questionAnswer = SurveyQuestionAnswer::create($data);
+
+        return response('', 201);
+    }
 
 }
